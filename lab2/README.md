@@ -15,44 +15,107 @@
     • Provides a file-based interface to kernel data structures.
 
 ## Commands and Execution
+1.  **Purpose:** Number of CPU Cores
+    
+      * **Command:**
+        ``` bash
+        grep -c ^processor /proc/cpuinfo
+        
+        ```
+      * **Output:**
+        ``` 
+        4
+        
+        ```
 
-(a) Number of CPU Cores
-Command:
-grep -c ^processor /proc/cpuinfo
-Explanation:
-    • /proc/cpuinfo lists details of each logical CPU.
-    • Each CPU entry starts with the line processor : <number>.
-    • grep -c counts how many lines match processor, i.e., how many cores/logical CPUs are available.
-Sample Output:
-4     -   Means the system has 4 CPU cores.
+2.  **Purpose:** Total Memory and Fraction of Free Memory
+    
+      * **Command 1 (Total and Free Memory):**
+        ``` bash
+        grep -E "MemTotal|MemFree" /proc/meminfo
+        
+        ```
+      * **Output 1:**
+        ``` 
+        MemTotal:        3897820 kB
+        MemFree:          475128 kB
+        
+        ```
+      * **Command 2 (Calculate Fraction of Free Memory):**
+        ``` bash
+        awk '/MemTotal/ {total=$2} /MemFree/ {free=$2} END {print "Free Fraction = " free/total}' /proc/meminfo
+        
+        ```
+      * **Output 2:**
+        ``` 
+        Free Fraction = 0.128011
+        
+        ```
 
-(b) Total Memory and Fraction of Free Memory
-Command:
-grep -E "MemTotal|MemFree" /proc/meminfo
-Sample Output:
-MemTotal:       8123456 kB
-MemFree:        2345678 kB
-To calculate the fraction of free memory:
-awk '/MemTotal/ {total=$2} /MemFree/ {free=$2} END {print "Free Fraction = " free/total}' /proc/meminfo
-awk is used for pattern scanning and text processing in Linux/Unix.It is especially powerful for extracting fields, filtering lines, and doing calculations on command output.
-Sample Output:
-Free Fraction = 0.2886
+3.  **Purpose:** Number of Processes Currently Running
+    
+      * **Command 1 (Using `ps` and `wc`):**
+        ``` bash
+        ps -e --no-headers | wc -l
+        
+        ```
+      * **Command 2 (Using `/proc` directly):**
+        ``` bash
+        ls -d /proc/[0-9]* | wc -l
+        
+        ```
+      * **Output (for both):**
+        ``` 
+        243
+        
+        ```
 
-About 28.86% of memory is currently free.
+4.  **Purpose:** Number of Processes in Running and Blocked States
+    
+      * **Command (Running Processes):**
+        ``` bash
+        grep "procs_running" /proc/stat
+        
+        ```
+      * **Output:**
+        ``` 
+        procs_running 1
+        
+        ```
+      * **Command (Blocked Processes):**
+        ``` bash
+        grep "procs_blocked" /proc/stat
+        
+        ```
+      * **Output:**
+        ``` 
+        procs_blocked 1
+        
+        ```
 
-(c) Number of Processes Currently Running
-Command:
-ps -e --no-headers | wc -l   
-or using /proc directly:
-ls -d /proc/[0-9]* | wc -l
-Explanation:
-    • Each active process has a directory /proc/<PID>.
-    • Counting these directories gives the total number of active processes.
-    • ps -e    → Displays all running processes in the system.
-    • --no-headers  → Removes the header line (like PID TTY TIME CMD) so only process entries remain.
-    • | (pipe) → Sends the output of ps to the next command.
-    • wc -l → Counts the number of lines.
-    • Top of Form
-    • Bottom of Form
-Sample Output:
-203
+5.  **Purpose:** Number of Processes Forked Since Last Boot
+    
+      * **Command:**
+        ``` bash
+        grep "processes" /proc/stat
+        
+        ```
+      * **Output:**
+        ``` 
+        processes 8366
+        
+        ```
+
+6.  **Purpose:** Identify a Process ID (PID) for a specific process (bash)
+    
+      * **Command:**
+        ``` bash
+        ps -C bash
+        
+        ```
+      * **Output:**
+        ``` 
+            PID TTY          TIME CMD
+           6046 pts/0    00:00:00 bash
+        
+        ```
